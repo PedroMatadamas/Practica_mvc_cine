@@ -1601,7 +1601,7 @@ class Controller:
 
     def read_carteleras(self,fecha,bandera):
         salas = self.model.read_all_cartelera(fecha)
-        if type(salas) != list:
+        if type(salas) != list or salas == []:
             self.view.error('El horario no existe')
             return False
         Horario=[]
