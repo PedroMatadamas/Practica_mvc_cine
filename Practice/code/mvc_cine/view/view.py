@@ -143,9 +143,12 @@ class View:
         print('3.  Mostrar todas las Peliculas')
         print('4.  Mostrar Descripciones')
         print('5   Ver detalles de pelicula')
-        print('6.  Actualizar Pelicula')
-        print('7. Borrar Pelicula')
-        print('8. Regresar')
+        print('6   Agregar detalles')
+        print('7   Editar detalles')
+        print('8.  Actualizar Pelicula')
+        print('9.  Borrar Detalles')
+        print('10. Borrar Pelicula')
+        print('11. Regresar')
     
     def show_a_movie(self, record):
         if record[3] == None:
