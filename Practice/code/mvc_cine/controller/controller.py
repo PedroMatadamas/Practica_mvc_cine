@@ -278,9 +278,9 @@ class Controller:
 
     def movies_menu(self):
         o = '0'
-        while o != '12':
+        while o != '8':
             self.view.movies_menu()
-            self.view.option('12')
+            self.view.option('8')
             o = input()
             if o == '1':
                 self.create_a_movie()
@@ -293,16 +293,10 @@ class Controller:
             elif o == '5':
                 self.read_details()
             elif o == '6':
-                self.add_details()
-            elif o == '7':
-                self.edit_details()
-            elif o == '8':
                 self.update_pelicula()
-            elif o == '9':
-                self.delete_detail()
-            elif o == '10':
+            elif o == '7':
                 self.delete_movie()
-            elif o == '11':
+            elif o == '8':
                 return
             else:
                 self.view.not_valid_option()
@@ -315,24 +309,21 @@ class Controller:
         Idioma = input()
         self.view.ask('Subtitulo: ')
         Subtitulo = input()
-        return [Titulo,Idioma,Subtitulo]
-
-    def ask_detail(self):
-        self.view.ask('id Titutlo: ')
-        id_pelicula= input()
         self.view.ask('Id Director: ')
         id_director = input()
         self.view.ask('Descripcion: ')
         descripcion = input()
         self.view.ask('Duracion: ')
+        
         duracion = input()
         self.view.ask('Año: ')
         año = input()
-        return [id_pelicula,id_director, descripcion,duracion,año]
+        return [Titulo,Idioma,Subtitulo,año,id_director, descripcion,duracion]
+
     
     def create_a_movie(self):
-        Titulo,Idioma,Subtitulo = self.ask_movie()
-        out = self.model.create_movie(Titulo,Idioma,Subtitulo)
+        Titulo,Idioma,Subtitulo,año,id_director, descripcion,duracion = self.ask_movie()
+        out = self.model.create_movie(Titulo,Idioma,Subtitulo,año,id_director, descripcion,duracion)
         if out == True:
             self.view.ok(Titulo, 'agrego')
         else:
@@ -380,20 +371,6 @@ class Controller:
                 self.view.error('No hay pelicula del año '+year)
             else:
                 self.view.error(' Hay un problema al leer las peliculas del año '+year)
-        return
-
-    def add_details(self):
-        self.read_all_movies()
-        self.read_all_directors()
-        dp_id_pelicula, dp_id_director, descripcion,dp_duracion,año = self.ask_detail()
-        out = self.model.create_detalles_pelicula(dp_id_pelicula, dp_id_director, descripcion,dp_duracion,año)
-        if out == True:
-            self.view.ok(dp_id_pelicula, 'agrego')
-        else:
-            if out == 1062:
-                self.view.error('ya existe una descripcion')
-            else:
-                self.view.error('No se pudo agregar la pelicula')
         return
 
     def read_details(self):
@@ -448,47 +425,6 @@ class Controller:
         else:
             self.view.error('Hay un problema al leer todas las decripciones ')       
 
-    def edit_details(self):
-        self.view.ask(' ID de descripcion de pelicula: ')
-        i_desc = input()
-        details = self.model.read_detalles_pelicula(i_desc)
-        if type(details) == list:
-            self.view.show_detail_header('Description de la pelicula  '+details[0][1]+' ')
-            for detail in details:
-                self.view.show_a_detail(detail)
-            self.view.show_detail_midder()
-            self.view.show_detail_footer()
-        else:
-            if details == None:
-                self.view.error('No existe la descricion')
-            else:
-                self.view.error('Problema al leer la descripcion')
-            return
-
-        self.view.msg('Ingresa los valores a modificar ( vacio para dejarlo igual ):')
-        whole_vals = self.ask_detail()
-        fields, vals = self.update_lists(['dp_id_pelicula', 'dp_id_director', 'descripcion','dp_duracion'],whole_vals)
-        vals.append(i_desc)
-        vals = tuple(vals)
-        out = self.model.update_detalles_pelicula(fields,vals)
-        if out == True:
-            self.view.ok(i_desc, 'atualizo')
-        else:
-            self.view.error('No se pudo actualizar')
-        return        
-
-    def delete_detail(self):
-        self.view.ask('ID de detalle a borrar: ')
-        dp_id_pelicula = input()
-        count = self.model.delate_detalles_prlicula(dp_id_pelicula)
-        if count != 0:
-            self.view.ok(dp_id_pelicula, 'Borro')
-        else:
-            if count == 0:
-                self.view.error('La pelicula no exite')
-            else:
-                self.view.error('Prblema al borrar la pelicula')
-        return
 
     def update_pelicula(self):
         self.view.ask(' ID de pelicula a modificar: ')
@@ -507,7 +443,7 @@ class Controller:
             return
         self.view.msg('Ingresa los valores a modificar ( vacio para dejarlo igual ):')
         whole_vals = self.ask_movie()
-        fields, vals = self.update_lists(['p_titulo','p_idioma','p_subtitulos','p_año'],whole_vals)
+        fields, vals = self.update_lists(['p_titulo','p_idioma','p_subtitulos','p_año', 'dp_id_director', 'descripcion','dp_duracion'],whole_vals)
         vals.append(id_pelicula)
         vals = tuple(vals)
         out = self.model.update_movie(fields,vals)
@@ -1858,6 +1794,8 @@ class Controller:
             asientos_existentes = self.model.read_sala(sala) #recibe el numero de asiento de una sala filas y columnas
 
             # comprueba que el asiento ingresado este dentro del rango de los asientos de la sala
+            print(StrA,asientos_existentes[2])
+            print(int(ord(reserva[0]))-65 , asientos_existentes[1])
             if int(ord(reserva[0]))-65 > asientos_existentes[1] or  StrA > asientos_existentes[2]: 
                 self.view.error(' No existe ese asiento intenta de nuevo ')
                 self.comprar_boleto()

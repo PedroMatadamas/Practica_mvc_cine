@@ -293,15 +293,16 @@ class Model:
     * peliculas metodos*
     *********************
     """
-    def create_movie(self,p_titulo,p_idioma,p_subtitulos):
+    def create_movie(self,p_titulo,p_idioma,p_subtitulos,p_año, dp_id_director, descripcion,dp_duracion):
         try:
-            sql = 'INSERT INTO peliculas (`p_titulo`,`p_idioma`,`p_subtitulos`) VALUES (%s,%s,%s)'
-            vals = (p_titulo,p_idioma,p_subtitulos)
+            sql = 'INSERT INTO peliculas (`p_titulo`,`p_idioma`,`p_subtitulos`,`p_año`, `dp_id_director`, `descripcion`,`dp_duracion`) VALUES (%s,%s, %s, %s,%s, %s,%s)'
+            vals = (p_titulo,p_idioma,p_subtitulos,p_año, dp_id_director, descripcion,dp_duracion)
             self.cursor.execute(sql,vals)
             self.cnx.commit()
             return True
         except connector.Error as err:
             self.cnx.rollback()
+            print(err)
             return err
 
     def read_a_movie(self,id_pelicula):
@@ -430,21 +431,11 @@ class Model:
     **
     """
 
-    def create_detalles_pelicula(self, dp_id_pelicula, dp_id_director, descripcion,dp_duracion,dp_año):
-        try:
-            sql = 'INSERT INTO detalles_peliculas(`dp_id_pelicula`, `dp_id_director`, `descripcion`,`dp_duracion`,`dp_año`) VALUES ( %s, %s, %s, %s,%s)'
-            vals = ( dp_id_pelicula, dp_id_director, descripcion,dp_duracion,dp_año)
-            self.cursor.execute(sql, vals)
-            self.cnx.commit()
-            return True
-        except connector.Error as err:
-            self.cnx.rollback()
-            print(err)
-            return err
+
 
     def read_detalles_pelicula(self, dp_id_pelicula):
         try: 
-            sql ='SELECT detalles_peliculas.dp_id_pelicula, peliculas.p_titulo, directores.d_nombre , detalles_peliculas.descripcion, detalles_peliculas.dp_duracion FROM peliculas JOIN detalles_peliculas ON peliculas.id_pelicula =  detalles_peliculas.dp_id_pelicula JOIN directores ON detalles_peliculas.dp_id_director = directores.id_director WHERE dp_id_pelicula = %s'
+            sql ='SELECT  peliculas.id_pelicula, peliculas.p_titulo, directores.d_nombre , peliculas.descripcion, peliculas.dp_duracion FROM peliculas  JOIN directores ON peliculas.dp_id_director = directores.id_director WHERE id_pelicula = %s'
             vals=(dp_id_pelicula, )
             self.cursor.execute(sql, vals)
             record = self.cursor.fetchall()
@@ -455,7 +446,7 @@ class Model:
 
     def read_all_detalles_pelicula(self):
         try: 
-            sql ='SELECT detalles_peliculas.dp_id_pelicula, peliculas.p_titulo, directores.d_nombre , detalles_peliculas.descripcion, detalles_peliculas.dp_duracion FROM peliculas JOIN detalles_peliculas ON peliculas.id_pelicula =  detalles_peliculas.dp_id_pelicula JOIN directores ON detalles_peliculas.dp_id_director = directores.id_director'
+            sql ='SELECT peliculas.id_pelicula, peliculas.p_titulo, directores.d_nombre , peliculas.descripcion, peliculas.dp_duracion FROM peliculas JOIN directores ON peliculas.dp_id_director = directores.id_director'
             self.cursor.execute(sql)
             record = self.cursor.fetchall()
             return record
@@ -463,29 +454,7 @@ class Model:
             return err
 
     
-    def update_detalles_pelicula(self, fields, vals):
-        try:
-            sql = 'UPDATE detalles_peliculas SET '+','.join(fields)+'WHERE id_dp = %s'
-            self.cursor.execute(sql,vals)
-            self.cnx.commit()
-            return True
-        except connector.Error as err:
-            self.cnx.rollback()
-            return err
-
-    def delate_detalles_prlicula(self, dp_id_pelicula):
-        try:
-            sql = 'DELETE FROM detalles_peliculas WHERE dp_id_pelicula = %s '
-            vals = (dp_id_pelicula, )
-            self.cursor.execute(sql, vals)
-            self.cnx.commit()
-            count = self.cursor.rowcount
-            return count
-        except connector.Error as err:
-            self.cnx.rollback()
-            return err
-
-
+    
     def read_a_dir_mov(self, id_director):
         try:
             sql = 'SELECT peliculas.id_pelicula ,peliculas.p_titulo, peliculas.p_idioma, peliculas.p_subtitulos, peliculas.p_año from detalles_peliculas join peliculas on peliculas.id_pelicula = detalles_peliculas.dp_id_pelicula where dp_id_director = %s'

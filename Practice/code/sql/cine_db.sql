@@ -29,7 +29,15 @@ create table if not exists peliculas(
     	p_idioma varchar(20) not null,
     	p_subtitulos varchar(40),
     	p_año varchar(5),
-    	primary key(id_pelicula)
+    	primary key(id_pelicula),
+        dp_id_director int not null,
+        descripcion varchar(100) not null,
+        dp_duracion varchar (8) not null,
+		constraint fkdp_id_director 
+        foreign key(dp_id_director)
+		references directores(id_director)
+		ON DELETE CASCADE
+        on update cascade
 )engine = InnoDB;
 
 
@@ -46,26 +54,6 @@ create table if not exists actorpeliculas(
         foreign key(ap_id_actor)
 		references actores(id_actor)
         ON DELETE CASCADE
-        on update cascade
-)engine = InnoDB;
-
-
-create table if not exists detalles_peliculas(
-		dp_id_pelicula int not null,
-        dp_id_director int not null,
-        descripcion varchar(100) not null,
-        dp_duracion varchar (8) not null,
-        dp_año varchar (4) not null,
-		primary key(dp_id_pelicula),
-		constraint fk_dp_id_pelicula 
-        foreign key(dp_id_pelicula)
-		references peliculas(id_pelicula)
-        ON DELETE CASCADE
-        on update cascade,
-		constraint fkdp_id_director 
-        foreign key(dp_id_director)
-		references directores(id_director)
-		ON DELETE CASCADE
         on update cascade
 )engine = InnoDB;
 
